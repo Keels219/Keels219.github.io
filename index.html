@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 1 Training — Equity Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0f1a0f;
+  --forest: #1a3a1a;
+  --green: #2d5a2d;
+  --leaf: #4a8c3f;
+  --gold: #c9a84c;
+  --gold-lt: #e8c96a;
+  --cream: #f5f0e8;
+  --mist: #e8ede8;
+  --white: #ffffff;
+  --gray: #7a8a7a;
+  --blue: #2d6fa8;
+  --teal: #1e8a7a;
+  --amber: #c47a2a;
+  --purple: #6b4fa8;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── NAV ── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: var(--forest);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem; height: 56px;
+  border-bottom: 1px solid rgba(201,168,76,0.3);
+}
+.nav-brand {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: 14px; letter-spacing: 0.12em;
+  color: var(--gold); text-transform: uppercase;
+}
+.nav-tabs { display: flex; gap: 4px; }
+.nav-tab {
+  padding: 6px 14px; border-radius: 6px; cursor: pointer;
+  font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.5);
+  transition: all 0.2s; border: none; background: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.nav-tab:hover { color: var(--white); background: rgba(255,255,255,0.08); }
+.nav-tab.active { color: var(--gold); background: rgba(201,168,76,0.15); }
+.nav-progress {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: rgba(255,255,255,0.5);
+}
+.progress-dots { display: flex; gap: 4px; }
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.2); transition: background 0.3s;
+}
+.dot.done { background: var(--gold); }
+.dot.active { background: var(--white); }
+
+/* ── SCREENS ── */
+.screen { display: none; padding-top: 56px; min-height: 100vh; }
+.screen.active { display: block; }
+
+/* ── HERO ── */
+.hero {
+  background: var(--forest);
+  padding: 5rem 2rem 4rem;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: -40%; right: -10%;
+  width: 60vw; height: 60vw; max-width: 700px; max-height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-grid {
+  max-width: 960px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+}
+.hero-eyebrow {
+  font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 1.5rem;
+}
+.hero-title {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: clamp(3rem, 7vw, 5.5rem); line-height: 0.95;
+  color: var(--white);
+}
+.hero-title span { color: var(--gold); }
+.hero-sub {
+  margin-top: 1.5rem; font-size: 15px; color: rgba(255,255,255,0.55);
+  line-height: 1.7; max-width: 400px;
+}
+.hero-cta {
+  margin-top: 2.5rem;
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--gold); color: var(--forest);
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px;
+  letter-spacing: 0.05em; padding: 14px 28px; border-radius: 8px;
+  cursor: pointer; border: none; transition: all 0.2s;
+}
+.hero-cta:hover { background: var(--gold-lt); transform: translateY(-1px); }
+.hero-modules { display: flex; flex-direction: column; gap: 10px; }
+.hero-mod {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px; padding: 16px 20px;
+  display: flex; align-items: center; gap: 14px;
+  cursor: pointer; transition: all 0.2s;
+}
+.hero-mod:hover { background: rgba(255,255,255,0.1); border-color: rgba(201,168,76,0.4); }
+.hero-mod-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 11px;
+  flex-shrink: 0;
+}
+.hero-mod-info { flex: 1; }
+.hero-mod-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 13px; color: var(--white); }
+.hero-mod-time { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.hero-mod-arrow { color: rgba(255,255,255,0.3); font-size: 16px; }
+
+/* ── MODULE LAYOUT ── */
+.module-wrap {
+  max-width: 960px; margin: 0 auto;
+  padding: 3rem 2rem 5rem;
+}
+.module-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 3rem; gap: 2rem;
+}
+.module-header-left {}
+.mod-label {
+  font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.mod-h1 {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1;
+  color: var(--ink);
+}
+.mod-desc {
+  margin-top: 1rem; font-size: 15px; color: var(--gray);
+  line-height: 1.7; max-width: 520px;
+}
+.mod-timer {
+  background: var(--forest); border-radius: 10px; padding: 12px 20px;
+  text-align: center; flex-shrink: 0; align-self: flex-start; margin-top: 8px;
+}
+.mod-timer-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 28px; color: var(--gold); }
+.mod-timer-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+/* ── CARDS ── */
+.card-grid { display: grid; gap: 12px; }
+.card-grid-2 { grid-template-columns: 1fr 1fr; }
+.card-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+.card-grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+.card {
+  background: var(--white); border-radius: 16px;
+  border: 1px solid rgba(0,0,0,0.07);
+  padding: 20px 22px; position: relative; overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+.card-accent {
+  position: absolute; top: 0; left: 0; width: 4px; bottom: 0;
+  border-radius: 16px 0 0 16px;
+}
+.card-num {
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 11px;
+  letter-spacing: 0.1em; opacity: 0.4; margin-bottom: 8px;
+}
+.card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--ink); }
+.card-body { font-size: 13px; color: var(--gray); line-height: 1.6; margin-top: 6px; }
+
+/* steps list */
+.steps-list { display: flex; flex-direction: column; gap: 0; }
+.step-item {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 16px 0; border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.step-item:last-child { border-bottom: none; }
+.step-circle {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 13px;
+  color: var(--white); margin-top: 2px;
+}
+.step-content {}
+.step-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 15px; color: var(--ink); }
+.step-desc { font-size: 13px; color: var(--gray); margin-top: 4px; line-height: 1.5; }
+
+/* stat cards */
+.stat-card {
+  background: var(--forest); border-radius: 16px; padding: 24px 20px; text-align: center;
+}
+.stat-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 3rem; line-height: 1; }
+.stat-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: 8px; }
+
+.funnel-row {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+}
+.funnel-arrow { font-size: 20px; color: var(--gray); flex-shrink: 0; }
+
+/* lap cards */
+.lap-card {
+  border-radius: 16px; overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.07);
+}
+.lap-header {
+  padding: 16px 20px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.lap-name { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; color: var(--white); }
+.lap-sub { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-top: 4px; }
+.lap-time { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.7); text-align: right; }
+.lap-quality { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+.lap-body { background: var(--white); padding: 16px 20px; }
+.lap-people { font-size: 13px; color: var(--gray); line-height: 1.8; }
+.lap-insight { font-size: 12px; font-weight: 500; color: var(--ink); margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.07); }
+
+/* air cards */
+.air-letter {
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 4rem; line-height: 1;
+  margin-bottom: 4px;
+}
+.air-word { font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.7; margin-bottom: 12px; }
+.air-desc { font-size: 13px; color: var(--gray); line-height: 1.6; }
+
+/* pitch steps */
+.pitch-flow { display: flex; gap: 8px; margin-bottom: 2rem; }
+.pitch-step {
+  flex: 1; border-radius: 12px; padding: 14px 12px; text-align: center;
+  border: 1.5px solid rgba(0,0,0,0.08); background: var(--mist);
+  transition: all 0.2s;
+}
+.pitch-step.today {
+  background: var(--forest); border-color: var(--gold);
+}
+.pitch-step-num { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; opacity: 0.5; margin-bottom: 4px; }
+.pitch-step-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; }
+.pitch-step.today .pitch-step-num { color: var(--gold); opacity: 1; }
+.pitch-step.today .pitch-step-name { color: var(--white); }
+.pitch-today-tag { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-top: 5px; }
+
+/* seen row */
+.seen-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+.seen-item {
+  background: var(--forest); border-radius: 12px; padding: 20px 12px; text-align: center;
+}
+.seen-letter { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.5rem; color: var(--gold); line-height: 1; }
+.seen-word { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 6px; }
+
+/* vs section */
+.vs-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; }
+.vs-badge {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--forest); border: 2px solid var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 12px; color: var(--gold);
+}
+.vs-card { border-radius: 16px; overflow: hidden; }
+.vs-card-header { padding: 16px 20px; }
+.vs-card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; }
+.vs-card-sub { font-size: 11px; opacity: 0.7; margin-top: 3px; }
+.vs-card-body { background: var(--white); padding: 16px 20px; }
+.vs-item { font-size: 13px; color: var(--gray); padding: 7px 0; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; align-items: flex-start; gap: 8px; }
+.vs-item:last-child { border-bottom: none; }
+.vs-check { font-size: 14px; flex-shrink: 0; }
+
+/* quiz section */
+.quiz-section {
+  background: var(--forest); border-radius: 20px;
+  padding: 28px 28px; margin-top: 2.5rem;
+}
+.quiz-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 12px;
+}
+.quiz-q { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 17px; color: var(--white); line-height: 1.4; margin-bottom: 20px; }
+.quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt {
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px; padding: 14px 18px; cursor: pointer;
+  font-size: 14px; color: rgba(255,255,255,0.85); text-align: left;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+.quiz-opt:hover:not(:disabled) { background: rgba(255,255,255,0.13); border-color: rgba(255,255,255,0.25); }
+.quiz-opt.correct { background: rgba(74,140,63,0.3); border-color: var(--leaf); color: var(--white); }
+.quiz-opt.wrong { background: rgba(180,60,60,0.3); border-color: #c0392b; color: var(--white); }
+.quiz-opt:disabled { cursor: default; }
+.quiz-feedback { margin-top: 14px; font-size: 14px; min-height: 20px; }
+.quiz-next-btn {
+  margin-top: 16px; display: none;
+  background: var(--gold); color: var(--forest);
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px;
+  letter-spacing: 0.05em; padding: 10px 22px; border-radius: 8px;
+  cursor: pointer; border: none;
+}
+.quiz-next-btn:hover { background: var(--gold-lt); }
+
+/* section dividers */
+.section-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gray); margin-bottom: 16px; margin-top: 2.5rem;
+}
+.section-label:first-child { margin-top: 0; }
+
+/* trainer note */
+.trainer-note {
+  background: rgba(45,111,168,0.08); border-left: 3px solid var(--blue);
+  border-radius: 0 10px 10px 0; padding: 14px 18px; margin-top: 16px;
+  font-size: 13px; color: var(--gray); line-height: 1.6;
+}
+.trainer-note strong { color: var(--blue); }
+
+/* module nav bar */
+.mod-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  max-width: 960px; margin: 0 auto;
+  padding: 1.5rem 2rem 0;
+}
+.mod-nav-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: none; border: 1.5px solid rgba(0,0,0,0.12); border-radius: 8px;
+  padding: 10px 18px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; color: var(--gray); transition: all 0.2s;
+}
+.mod-nav-btn:hover { border-color: var(--green); color: var(--green); }
+.mod-nav-btn.next-btn {
+  background: var(--forest); border-color: var(--forest); color: var(--white);
+  font-family: 'Syne', sans-serif; font-weight: 700;
+}
+.mod-nav-btn.next-btn:hover { background: var(--green); border-color: var(--green); }
+.mod-counter { font-size: 12px; color: var(--gray); }
+
+/* day-type pills */
+.day-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 1.5rem; }
+.day-pill { border-radius: 14px; padding: 20px; background: var(--white); border: 1px solid rgba(0,0,0,0.07); }
+.day-letter { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2rem; }
+.day-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 13px; color: var(--ink); margin-top: 8px; }
+.day-test { font-size: 12px; color: var(--gray); margin-top: 4px; }
+
+/* discovery box */
+.discovery-box {
+  border: 2px dashed var(--gold); border-radius: 16px;
+  padding: 24px; margin-bottom: 2rem; background: rgba(201,168,76,0.04);
+}
+.discovery-box p { font-size: 15px; color: var(--ink); line-height: 1.7; }
+.discovery-box strong { color: var(--amber); }
+
+/* completion screen */
+.completion { text-align: center; padding: 5rem 2rem; max-width: 600px; margin: 0 auto; }
+.completion-icon { font-size: 5rem; margin-bottom: 1.5rem; }
+.completion h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 3rem; color: var(--ink); }
+.completion p { font-size: 16px; color: var(--gray); margin-top: 1rem; line-height: 1.7; }
+.completion-score {
+  margin: 2rem 0; background: var(--forest); border-radius: 16px; padding: 24px;
+  color: var(--white);
+}
+.completion-score-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 4rem; color: var(--gold); }
+
+/* color helpers */
+.c-blue { color: var(--blue); }
+.c-teal { color: var(--teal); }
+.c-amber { color: var(--amber); }
+.c-purple { color: var(--purple); }
+.c-gold { color: var(--gold); }
+.c-leaf { color: var(--leaf); }
+.bg-blue { background: var(--blue); }
+.bg-teal { background: var(--teal); }
+.bg-amber { background: var(--amber); }
+.bg-purple { background: var(--purple); }
+.bg-gold { background: var(--gold); }
+.bg-leaf { background: var(--leaf); }
+
+@media (max-width: 680px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .card-grid-2, .card-grid-3, .card-grid-4 { grid-template-columns: 1fr; }
+  .seen-row { grid-template-columns: repeat(2,1fr); }
+  .vs-grid { grid-template-columns: 1fr; }
+  .vs-badge { display: none; }
+  .day-row { grid-template-columns: 1fr; }
+  .pitch-flow { flex-wrap: wrap; }
+  .funnel-row { flex-wrap: wrap; justify-content: center; }
+}
+
+/* ── DAY 2 EXTRAS ────────────────────────────────────────────────────────── */
+
+/* 5-step conversation flow */
+.convo-step {
+  display:flex; align-items:flex-start; gap:16px;
+  padding:18px 0; border-bottom:1px solid rgba(0,0,0,0.06);
+}
+.convo-step:last-child { border-bottom:none; }
+.convo-num {
+  width:36px; height:36px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Syne',sans-serif; font-weight:800; font-size:14px;
+  color:var(--white); margin-top:2px;
+}
+.convo-content {}
+.convo-title { font-family:'Syne',sans-serif; font-weight:700; font-size:15px; color:var(--ink); }
+.convo-pitch-link {
+  display:inline-block; margin-top:6px; font-size:11px; font-weight:600;
+  letter-spacing:0.12em; text-transform:uppercase; padding:4px 12px;
+  border-radius:6px; color:var(--white);
+}
+.convo-desc { font-size:13px; color:var(--gray); margin-top:4px; line-height:1.55; }
+.convo-pitch-quote {
+  margin-top:10px; background:rgba(0,0,0,0.04); border-left:3px solid;
+  padding:10px 14px; border-radius:0 8px 8px 0;
+  font-size:13px; color:var(--gray); line-height:1.6; font-style:italic;
+}
+
+/* pitch bridge card */
+.bridge-card {
+  background:var(--forest); border-radius:16px; padding:24px; margin:2rem 0;
+}
+.bridge-title { font-family:'Syne',sans-serif; font-weight:800; font-size:18px; color:var(--gold); margin-bottom:16px; }
+.bridge-row {
+  display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:center; margin-bottom:10px;
+}
+.bridge-box {
+  background:rgba(255,255,255,0.07); border-radius:10px; padding:12px 14px;
+  font-size:12px; color:rgba(255,255,255,0.8); line-height:1.5;
+}
+.bridge-box strong { color:var(--gold); display:block; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:4px; }
+.bridge-arrow { color:var(--gold); font-size:18px; text-align:center; }
+
+/* product tier cards */
+.prod-card {
+  border-radius:16px; overflow:hidden; border:1.5px solid rgba(0,0,0,0.08); margin-bottom:14px;
+}
+.prod-header {
+  padding:18px 20px; display:flex; justify-content:space-between; align-items:flex-start;
+}
+.prod-name { font-family:'Syne',sans-serif; font-weight:800; font-size:20px; color:var(--white); }
+.prod-sub { font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.6); margin-top:4px; }
+.prod-price { font-family:'Syne',sans-serif; font-weight:800; font-size:26px; color:var(--white); text-align:right; line-height:1; }
+.prod-price-note { font-size:10px; color:rgba(255,255,255,0.6); text-align:right; margin-top:3px; }
+.prod-body { background:var(--white); padding:16px 20px; }
+.prod-row {
+  display:flex; justify-content:space-between; padding:7px 0;
+  border-bottom:1px solid rgba(0,0,0,0.05); font-size:13.5px;
+}
+.prod-row:last-child { border-bottom:none; }
+.prod-lbl { color:var(--gray); }
+.prod-val { font-weight:500; color:var(--ink); }
+.prod-val-free { color:#2a7a2a; font-weight:600; }
+.prod-val-fee { color:#c0392b; }
+.prod-tip {
+  background:rgba(0,0,0,0.04); border-left:3px solid; border-radius:0 8px 8px 0;
+  padding:10px 14px; margin-top:12px; font-size:13px; color:var(--gray); line-height:1.55;
+}
+.prod-tip strong { color:var(--ink); }
+
+/* TV package grid */
+.tv-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+.tv-pkg {
+  background:var(--white); border-radius:14px; border:1.5px solid rgba(0,0,0,0.08);
+  padding:16px;
+}
+.tv-pkg.featured { border-color:var(--gold); }
+.tv-pkg-badge {
+  font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:6px;
+}
+.tv-pkg-name { font-family:'Syne',sans-serif; font-weight:700; font-size:15px; color:var(--ink); }
+.tv-pkg-price { font-family:'Syne',sans-serif; font-weight:800; font-size:22px; color:var(--forest); margin:6px 0; }
+.tv-pkg-ch { font-size:12px; color:var(--gray); }
+.tv-pkg-note { font-size:11px; color:var(--gray); margin-top:6px; line-height:1.4; }
+
+/* discount table */
+.disc-table { background:var(--white); border-radius:16px; overflow:hidden; border:1.5px solid rgba(0,0,0,0.08); margin-bottom:14px; }
+.disc-head { background:var(--forest); padding:12px 18px; font-family:'Syne',sans-serif; font-weight:700; font-size:12px; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); }
+.disc-row { display:flex; justify-content:space-between; align-items:center; padding:12px 18px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13.5px; gap:12px; }
+.disc-row:last-child { border-bottom:none; }
+.disc-who { color:var(--ink); font-weight:500; }
+.disc-who-sub { font-size:11px; color:var(--gray); margin-top:2px; }
+.disc-amt { font-family:'Syne',sans-serif; font-weight:800; font-size:18px; color:var(--forest); white-space:nowrap; }
+
+/* package builder */
+.builder-wrap { background:var(--white); border-radius:16px; border:1.5px solid rgba(0,0,0,0.08); padding:20px; margin-bottom:14px; }
+.builder-h { font-family:'Syne',sans-serif; font-weight:700; font-size:18px; color:var(--ink); margin-bottom:4px; }
+.builder-sub { font-size:13px; color:var(--gray); margin-bottom:18px; }
+.b2-row { margin-bottom:14px; }
+.b2-label { font-size:10px; font-weight:600; letter-spacing:0.15em; text-transform:uppercase; color:var(--gray); margin-bottom:6px; }
+.b2-select {
+  width:100%; padding:11px 14px; border-radius:10px;
+  border:1.5px solid rgba(0,0,0,0.1); background:var(--cream);
+  font-family:'DM Sans',sans-serif; font-size:13.5px; color:var(--ink);
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a8a7a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 14px center;
+}
+.b2-total-panel { background:var(--forest); border-radius:16px; padding:20px; }
+.b2-line { display:flex; justify-content:space-between; font-size:13px; color:rgba(255,255,255,0.6); padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+.b2-line:last-child { border-bottom:none; }
+.b2-line-disc { color:var(--gold-lt); }
+.b2-grand-row { display:flex; justify-content:space-between; align-items:flex-end; padding-top:16px; border-top:1px solid rgba(255,255,255,0.15); }
+.b2-grand-label { font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:rgba(255,255,255,0.4); margin-bottom:2px; }
+.b2-grand-note { font-size:11px; color:rgba(255,255,255,0.3); }
+.b2-grand-total { font-family:'Syne',sans-serif; font-weight:800; font-size:36px; color:var(--white); line-height:1; }
+
+/* QR / kahoot screen */
+.kahoot-wrap { text-align:center; padding:3rem 2rem; max-width:500px; margin:0 auto; }
+.kahoot-icon { font-size:5rem; margin-bottom:1.2rem; }
+.kahoot-title { font-family:'Syne',sans-serif; font-weight:800; font-size:2.5rem; color:var(--ink); line-height:1.1; }
+.kahoot-sub { font-size:15px; color:var(--gray); margin-top:1rem; line-height:1.7; }
+.qr-box {
+  margin:2rem auto; width:220px; height:220px;
+  border:3px solid var(--forest); border-radius:20px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--white); position:relative; overflow:hidden;
+}
+.qr-box svg { width:180px; height:180px; }
+.qr-placeholder {
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  color:var(--gray); font-size:13px; text-align:center;
+}
+.qr-placeholder-icon { font-size:3rem; }
+.kahoot-rules {
+  background:var(--forest); border-radius:16px; padding:20px 24px;
+  text-align:left; margin-top:2rem;
+}
+.kahoot-rules-title { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; color:var(--gold); margin-bottom:12px; }
+.kahoot-rule { font-size:13px; color:rgba(255,255,255,0.7); padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; gap:10px; }
+.kahoot-rule:last-child { border-bottom:none; }
+.kahoot-rule-num { color:var(--gold); font-weight:700; flex-shrink:0; }
+
+/* pricing hub tabs inside module */
+.ptab-row { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; }
+.ptab {
+  padding:7px 16px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:600;
+  border:1.5px solid rgba(0,0,0,0.1); background:var(--mist); color:var(--gray);
+  font-family:'Syne',sans-serif; transition:all 0.2s;
+}
+.ptab.active { background:var(--forest); border-color:var(--forest); color:var(--white); }
+.ptab-panel { display:none; }
+.ptab-panel.active { display:block; }
+
+@media (max-width:680px) {
+  .bridge-row { grid-template-columns:1fr; }
+  .bridge-arrow { display:none; }
+  .tv-grid { grid-template-columns:1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand">Equity Management</div>
+  <div class="nav-tabs" id="navTabs"></div>
+  <div class="nav-progress">
+    <div class="progress-dots" id="progressDots"></div>
+    <span id="progressText" style="font-size:11px;"></span>
+  </div>
+</nav>
+
+<!-- SCREEN 0: HOME -->
+<div class="screen active" id="screen-0">
+  <div class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-eyebrow">New Hire Onboarding · Day 1</div>
+        <div class="hero-title">Day <span>1</span><br>Training</div>
+        <div class="hero-sub">5 modules. 90 minutes. Everything you need to walk out the door with confidence on Day 1.</div>
+        <button class="hero-cta" onclick="goTo(1)">Start Training →</button>
+      </div>
+      <div class="hero-modules" id="heroModules"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREENS 1–5 built by JS -->
+<div id="dynamicScreens"></div>
+
+<!-- SCREEN 6: COMPLETE -->
+<div class="screen" id="screen-6">
+  <div class="completion">
+    <div class="completion-icon">🏆</div>
+    <h1>Day 1 Complete</h1>
+    <p>You've covered all five modules. Time to take what you learned and put it to work.</p>
+    <div class="completion-score">
+      <div class="completion-score-num" id="finalScore">5/5</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-top:6px;letter-spacing:0.1em;text-transform:uppercase;">Questions correct</div>
+    </div>
+    <p style="font-size:13px;color:var(--gray);">18 Imperial Pl, Providence, RI · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="422a30022733372b363b2f252f362b2c216c212d2f">[email&#160;protected]</a></p>
+    <button class="hero-cta" style="margin-top:2rem;" onclick="goTo(0)">← Back to Home</button>
+    <button class="hero-cta" style="margin-top:1rem;background:var(--teal);color:var(--white);" onclick="goTo(7)">Start Day 2 →</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- DAY 2 SCREENS                                                            -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+
+<!-- SCREEN 7: DAY 2 HOME -->
+<div class="screen" id="screen-7">
+  <div class="hero" style="background:linear-gradient(135deg,var(--forest) 0%,#0d2b0d 100%);">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-eyebrow" style="color:var(--gold)">New Hire Onboarding · Day 2</div>
+        <div class="hero-title">Day <span>2</span><br>Training</div>
+        <div class="hero-sub">4 modules. The pitch in full. Products cold. Pricing on lock. Then a Kahoot to prove it.</div>
+        <button class="hero-cta" onclick="goTo(8)">Start Day 2 →</button>
+      </div>
+      <div class="hero-modules" id="d2HeroModules"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREENS 8–11 built by JS -->
+<div id="d2DynamicScreens"></div>
+
+<!-- SCREEN 12: DAY 2 COMPLETE -->
+<div class="screen" id="screen-12">
+  <div class="completion">
+    <div class="completion-icon">🔥</div>
+    <h1>Day 2 Complete</h1>
+    <p>You know the pitch, you know the product, you know the pricing. Tomorrow you knock doors. Let's go.</p>
+    <div class="completion-score">
+      <div class="completion-score-num" id="d2FinalScore">4/4</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-top:6px;letter-spacing:0.1em;text-transform:uppercase;">Questions correct</div>
+    </div>
+    <p style="font-size:13px;color:var(--gray);">Equity Management · Providence, RI</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:2rem;">
+      <button class="hero-cta" style="background:var(--forest);" onclick="goTo(7)">← Day 2 Home</button>
+      <button class="hero-cta" style="background:var(--teal);" onclick="goTo(0)">Back to Day 1</button>
+    </div>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const MODULES = [
+  {
+    id: 1, label: 'Module 1', title: '8 Steps\nto Success', time: 20,
+    color: 'var(--blue)', colorHex: '#2d6fa8',
+    desc: 'The daily habits that separate consistent performers from everyone else. Not talent — process.',
+    build: buildMod1
+  },
+  {
+    id: 2, label: 'Module 2', title: 'Law of\nAverages', time: 15,
+    color: 'var(--teal)', colorHex: '#1e8a7a',
+    desc: 'Sales is a numbers game, full stop. Volume is the only variable you fully control.',
+    build: buildMod2
+  },
+  {
+    id: 3, label: 'Module 3', title: 'Garden\nTheory', time: 15,
+    color: 'var(--amber)', colorHex: '#c47a2a',
+    desc: 'Your territory is a garden. Timing determines what you harvest. Work all 3 laps.',
+    build: buildMod3
+  },
+  {
+    id: 4, label: 'Module 4', title: 'Pitch\nIntro + AIR', time: 25,
+    color: 'var(--purple)', colorHex: '#6b4fa8',
+    desc: `Learn the 5-step pitch skeleton and your first rebuttal system for quick no\'s at the door.`,
+    build: buildMod4
+  },
+  {
+    id: 5, label: 'Module 5', title: 'Fiber vs.\nCopper', time: 15,
+    color: 'var(--leaf)', colorHex: '#4a8c3f',
+    desc: 'Why Verizon wins the technology conversation — and why it matters at every door.',
+    build: buildMod5
+  },
+];
+
+let scores = { total: 0, answered: {} };
+let currentScreen = 0;
+
+function goTo(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('screen-' + n);
+  if (target) { target.classList.add('active'); window.scrollTo(0, 0); }
+  currentScreen = n;
+  updateNav();
+  if (n === 6) {
+    document.getElementById('finalScore').textContent =
+      scores.total + '/' + Object.keys(scores.answered).length;
+  }
+  if (n === 12) {
+    document.getElementById('d2FinalScore').textContent =
+      d2scores.total + '/' + Object.keys(d2scores.answered).length;
+  }
+}
+
+function updateNav() {
+  const tabs = document.getElementById('navTabs');
+  tabs.innerHTML = '';
+  // Show Day 1 tabs for screens 0-6, Day 2 tabs for screens 7+
+  let allScreens;
+  if (currentScreen <= 6) {
+    allScreens = [{ label: 'Home', id: 0 }, ...MODULES.map(m => ({ label: 'Mod ' + m.id, id: m.id }))];
+  } else {
+    allScreens = [{ label: 'Day 2 Home', id: 7 }, ...D2MODULES.map(m => ({ label: m.shortLabel, id: m.id }))];
+  }
+  allScreens.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-tab' + (currentScreen === s.id ? ' active' : '');
+    btn.textContent = s.label;
+    btn.onclick = () => goTo(s.id);
+    tabs.appendChild(btn);
+  });
+
+  const dots = document.getElementById('progressDots');
+  dots.innerHTML = '';
+  const activeMods = currentScreen <= 6 ? MODULES : D2MODULES;
+  const activeScores = currentScreen <= 6 ? scores : d2scores;
+  activeMods.forEach(m => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (activeScores.answered[m.id] !== undefined ? ' done' : currentScreen === m.id ? ' active' : '');
+    dots.appendChild(d);
+  });
+  const doneCount = Object.keys(activeScores.answered).length;
+  const totalCount = activeMods.length;
+  document.getElementById('progressText').textContent = doneCount + '/' + totalCount + ' done';
+}
+
+function moduleWrap(modIdx, innerHtml) {
+  const mod = MODULES[modIdx];
+  const isLast = modIdx === MODULES.length - 1;
+  const prevId = modIdx === 0 ? 0 : mod.id - 1;
+  const nextId = isLast ? 6 : mod.id + 1;
+  const nextLabel = isLast ? 'Finish Training' : 'Next: ' + MODULES[modIdx + 1].title.replace('\n', ' ');
+
+  return `
+    <div class="mod-nav">
+      <button class="mod-nav-btn" onclick="goTo(${prevId})">← ${modIdx === 0 ? 'Home' : MODULES[modIdx-1].title.replace('\n',' ')}</button>
+      <div class="mod-counter">${mod.label} of 5</div>
+      <button class="mod-nav-btn next-btn" onclick="goTo(${nextId})">${nextLabel} →</button>
+    </div>
+    <div class="module-wrap">
+      <div class="module-header">
+        <div class="module-header-left">
+          <div class="mod-label" style="color:${mod.color}">${mod.label} — ${mod.title.replace('\n', ' ')}</div>
+          <div class="mod-h1">${mod.title.replace('\n', '<br>')}</div>
+          <div class="mod-desc">${mod.desc}</div>
+        </div>
+        <div class="mod-timer">
+          <div class="mod-timer-num">${mod.time}</div>
+          <div class="mod-timer-label">minutes</div>
+        </div>
+      </div>
+      ${innerHtml}
+    </div>
+  `;
+}
+
+function quizHtml(modId, question, opts, correctIdx, followupMsg) {
+  return `
+    <div class="quiz-section">
+      <div class="quiz-label">Quick Check</div>
+      <div class="quiz-q">${question}</div>
+      <div class="quiz-opts" id="qopts-${modId}">
+        ${opts.map((o, i) => `<button class="quiz-opt" onclick="quizAnswer(${modId},${i},${i===correctIdx},${correctIdx},'${followupMsg}')">${o}</button>`).join('')}
+      </div>
+      <div class="quiz-feedback" id="qfb-${modId}"></div>
+      <button class="quiz-next-btn" id="qnxt-${modId}" onclick="sendToChat(${modId},'${followupMsg}')">Ask a follow-up ↗</button>
+    </div>
+  `;
+}
+
+function quizAnswer(modId, idx, correct, correctIdx, followup) {
+  if (scores.answered[modId] !== undefined) return;
+  scores.answered[modId] = correct ? 1 : 0;
+  if (correct) scores.total++;
+
+  const opts = document.querySelectorAll(`#qopts-${modId} .quiz-opt`);
+  opts.forEach((o, i) => {
+    o.disabled = true;
+    if (i === idx) o.classList.add(correct ? 'correct' : 'wrong');
+    if (!correct && i === correctIdx) o.classList.add('correct');
+  });
+
+  const fb = document.getElementById('qfb-' + modId);
+  fb.style.color = correct ? '#4a8c3f' : '#c0392b';
+  fb.textContent = correct ? '✓ Correct — well done.' : '✗ Not quite — review the highlighted answer.';
+
+  document.getElementById('qnxt-' + modId).style.display = 'inline-block';
+  updateNav();
+}
+
+function sendToChat(modId, msg) {
+  if (typeof sendPrompt === 'function') sendPrompt(msg);
+}
+
+// ── BUILD MODULE 1 ──────────────────────────────────────────────────────────
+function buildMod1() {
+  const steps = [
+    ['Have a Great Attitude', 'Life is 99% attitude, 1% ability. Let your attitude dictate your results — not the other way around.', 'var(--blue)'],
+    ['Be On Time', 'If you\'re early, you\'re on time. If you\'re on time, you\'re late. Punctuality earns respect.', 'var(--blue)'],
+    ['Always Be Prepared', 'Physically prep the night before. Mental readiness removes unnecessary stress from the field.', 'var(--teal)'],
+    ['Work Your Full 8 Hours', 'Input = Output. Quality time with quality people. You vs. the day — choose to win.', 'var(--teal)'],
+    ['Work Territory Properly', '3-lap system. Research the night before. Talk to everyone — absolutely no cherry picking.', 'var(--leaf)'],
+    ['Maintain a Great Attitude', 'Losing it short-term is normal. What matters is how fast you get it back. Event + Response = Outcome.', 'var(--leaf)'],
+    ['Know Why You\'re Here', 'Set daily, weekly, and monthly goals. Short-term actions build long-term success.', 'var(--amber)'],
+    ['Take Control', 'You miss 100% of the shots you don\'t take. Your network = your net worth.', 'var(--amber)'],
+  ];
+
+  return moduleWrap(0, `
+    <div class="steps-list">
+      ${steps.map((s, i) => `
+        <div class="step-item">
+          <div class="step-circle" style="background:${s[2]}">${i + 1}</div>
+          <div class="step-content">
+            <div class="step-title">${s[0]}</div>
+            <div class="step-desc">${s[1]}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="trainer-note"><strong>Trainer note:</strong> Steps 1 and 6 look similar — address it directly. Step 1 is about starting right; Step 6 is about recovery after things go sideways. Both matter and they reinforce each other throughout the day.</div>
+    ${quizHtml(1,
+      'You hit 5 no\'s back-to-back by 3pm. What\'s the right move according to Step 6?',
+      ['Wrap up early — it\'s clearly not your day', 'Acknowledge it, reset your attitude, and keep going', 'Skip to your best-looking houses to find momentum'],
+      1, 'Can you explain the difference between Steps 1 and 6 in the 8 Steps to Success for Equity Management training?'
+    )}
+  `);
+}
+
+// ── BUILD MODULE 2 ──────────────────────────────────────────────────────────
+function buildMod2() {
+  return moduleWrap(1, `
+    <div class="section-label">The funnel</div>
+    <div class="funnel-row">
+      <div class="stat-card" style="flex:1"><div class="stat-num c-teal">60</div><div class="stat-label">Houses</div></div>
+      <div class="funnel-arrow">→</div>
+      <div class="stat-card" style="flex:1"><div class="stat-num c-teal">30</div><div class="stat-label">Talk-to's</div></div>
+      <div class="funnel-arrow">→</div>
+      <div class="stat-card" style="flex:1"><div class="stat-num c-teal">6–8</div><div class="stat-label">Presentations</div></div>
+      <div class="funnel-arrow">→</div>
+      <div class="stat-card" style="flex:1"><div class="stat-num c-gold">1–4</div><div class="stat-label">Sales</div></div>
+    </div>
+
+    <div class="card-grid card-grid-3" style="margin-bottom:2rem;">
+      <div class="card" style="border-left:4px solid var(--teal);">
+        <div class="card-title c-teal">NO = Next Opportunity</div>
+        <div class="card-body">Every rejection moves you closer to a yes. Reframe every no immediately.</div>
+      </div>
+      <div class="card" style="border-left:4px solid var(--leaf);">
+        <div class="card-title c-leaf">More = More</div>
+        <div class="card-body">Volume is the only variable you fully control. Work the math every single day.</div>
+      </div>
+      <div class="card" style="border-left:4px solid var(--amber);">
+        <div class="card-title c-amber">Never Cherry Pick</div>
+        <div class="card-body">Talk to everyone. The sale you skip is the sale you'll never know you missed.</div>
+      </div>
+    </div>
+
+    <div class="section-label">3 types of days</div>
+    <div class="day-row">
+      <div class="day-pill">
+        <div class="day-letter c-teal">A</div>
+        <div class="day-title">Fast Start, Slow Finish</div>
+        <div class="day-test">Tests: Work Ethic — don't coast after a strong morning</div>
+      </div>
+      <div class="day-pill">
+        <div class="day-letter c-blue">B</div>
+        <div class="day-title">Consistent Throughout</div>
+        <div class="day-test">Tests: Student Mentality — stay coachable, keep building</div>
+      </div>
+      <div class="day-pill">
+        <div class="day-letter c-amber">C</div>
+        <div class="day-title">Slow Start, Fast Finish</div>
+        <div class="day-test">Tests: Attitude — the morning grind sets up the afternoon</div>
+      </div>
+    </div>
+    <div class="trainer-note"><strong>Activity (4 min):</strong> Have each new hire calculate their own weekly earnings out loud using the pay structure. 4 Gig sales/day × 5 days. Getting them invested in the math makes it click fast.</div>
+    ${quizHtml(2,
+      'You knocked 60 houses and only talked to 12 people. What should you do differently?',
+      ['Move to a neighborhood with more people home', 'Focus on houses with cars in the driveway', 'Run all 3 laps fully — revisit every unanswered door'],
+      2, 'Quiz me more on the Law of Averages from Equity Management Day 1 training.'
+    )}
+  `);
+}
+
+// ── BUILD MODULE 3 ──────────────────────────────────────────────────────────
+function buildMod3() {
+  const laps = [
+    { name: 'LAP 1', sub: 'Weeding', time: '2:30 – 4:30 PM', quality: 'LOW QUALITY', qc: 'var(--gray)', bg: 'var(--amber)', people: 'Retirees · Stay-at-home parents · Work from home · Babysitters · Kids', insight: 'Build your list — note interested homes to revisit in Lap 3.' },
+    { name: 'LAP 2', sub: 'Seeding', time: '4:30 – 6:30 PM', quality: 'MEDIUM QUALITY', qc: 'var(--blue)', bg: 'var(--blue)', people: 'Everyone from Lap 1 · Teachers · 9-to-5ers · Construction workers · Police', insight: 'Build momentum — soft interest here becomes a close in Lap 3.' },
+    { name: 'LAP 3 ★', sub: 'Harvesting', time: '6:30 – 8:00 PM', quality: 'HIGH QUALITY', qc: 'var(--teal)', bg: 'var(--teal)', people: 'Everyone + Business owners · Lawyers · Contractors · White collar workers', insight: 'Prime time — sharpen your energy. Most sales happen here.' },
+  ];
+
+  return moduleWrap(2, `
+    <div class="card-grid card-grid-3" style="margin-bottom:2rem;">
+      ${laps.map(l => `
+        <div class="lap-card">
+          <div class="lap-header" style="background:${l.bg}">
+            <div>
+              <div class="lap-name">${l.name}</div>
+              <div class="lap-sub">${l.sub}</div>
+            </div>
+            <div>
+              <div class="lap-time">${l.time}</div>
+              <div class="lap-quality" style="color:${l.qc === 'var(--gray)' ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.9)'}">${l.quality}</div>
+            </div>
+          </div>
+          <div class="lap-body">
+            <div class="lap-people">${l.people}</div>
+            <div class="lap-insight">→ ${l.insight}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="card-grid card-grid-3">
+      <div class="card" style="border-left:4px solid var(--amber);">
+        <div class="card-title c-amber">Lap 1 Plants Seeds</div>
+        <div class="card-body">These aren't throwaway knocks. Early conversations identify who to revisit when decision-makers are home.</div>
+      </div>
+      <div class="card" style="border-left:4px solid var(--blue);">
+        <div class="card-title c-blue">Lap 2 Builds Momentum</div>
+        <div class="card-body">Warm people up. Even soft interest in Lap 2 frequently becomes a sale in Lap 3.</div>
+      </div>
+      <div class="card" style="border-left:4px solid var(--teal);">
+        <div class="card-title c-teal">Lap 3 is Prime Time</div>
+        <div class="card-body">Everyone is home. Your energy and pitch should be sharpest here — never quit early.</div>
+      </div>
+    </div>
+    <div class="trainer-note"><strong>Ask the group:</strong> "Who did you see in Lap 1 that you'd go back to in Lap 3?" Building this habit on Day 1 is one of the biggest differentiators you can create early.</div>
+    ${quizHtml(3,
+      "It's 7:15pm and you're exhausted. Why is this the worst time to quit?",
+      ["You haven't hit your 60-house count yet", "Lap 3 is your highest-quality audience — you've been building to this all day", "Your manager will see you left early"],
+      1, 'Give me more Garden Theory practice scenarios for Equity Management training.'
+    )}
+  `);
+}
+
+// ── BUILD MODULE 4 ──────────────────────────────────────────────────────────
+function buildMod4() {
+  const pitchSteps = ['Introduction', 'Short Story', 'Presentation', 'The Close', 'Rehash'];
+  const air = [
+    { l: 'A', w: 'Agree', d: 'Validate what they said — never argue. "I completely understand." Make them feel heard immediately.', c: 'var(--blue)' },
+    { l: 'I', w: 'Ignore', d: "Don't dwell on the objection. Acknowledge it and move past it — don't let it become the topic.", c: 'var(--amber)' },
+    { l: 'R', w: 'Resume', d: `Pivot right back into your short story. Get to your "reason I\'m here" line as fast as possible.`, c: 'var(--teal)' },
+  ];
+
+  return moduleWrap(3, `
+    <div class="section-label">The 5-step pitch skeleton</div>
+    <div class="pitch-flow">
+      ${pitchSteps.map((step, i) => `
+        <div class="pitch-step ${i < 2 ? 'today' : ''}">
+          <div class="pitch-step-num">${i + 1}</div>
+          <div class="pitch-step-name">${step}</div>
+          ${i < 2 ? '<div class="pitch-today-tag">TODAY\'S FOCUS</div>' : ''}
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="section-label">S.E.E.N. — your introduction</div>
+    <div class="seen-row">
+      ${[['S','Smile'],['E','Eye Contact'],['E','Enthusiasm'],['N','Nodding']].map(([l,w]) => `
+        <div class="seen-item">
+          <div class="seen-letter">${l}</div>
+          <div class="seen-word">${w}</div>
+        </div>
+      `).join('')}
+    </div>
+    <p style="font-size:14px;color:var(--gray);margin-bottom:2rem;font-style:italic;">A great intro makes for an easy close. S.E.E.N. is fully within your control before you even say a word.</p>
+
+    <div class="section-label">AIR — first rebuttal system</div>
+    <p style="font-size:14px;color:var(--gray);margin-bottom:1.2rem;">Used for quick no's at the door — people who shut you down before you even get started.</p>
+    <div class="card-grid card-grid-3" style="margin-bottom:1rem;">
+      ${air.map(a => `
+        <div class="card" style="border-top:4px solid ${a.c}; padding-top:20px;">
+          <div class="air-letter" style="color:${a.c}">${a.l}</div>
+          <div class="air-word">${a.w}</div>
+          <div class="air-desc">${a.d}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="card" style="background:var(--forest);border:none;margin-bottom:0.5rem;">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--gold)">Rule: 2 no's and go.</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:6px;">Don't force it. Keep your energy high and keep moving. The next door is your next opportunity.</div>
+    </div>
+    <div class="trainer-note"><strong>Role-play (10 min):</strong> Pair up. Rep delivers intro + short story from memory. Homeowner responds naturally. Switch after 2 min. Trainer coaches S.E.E.N. factors. Goal: comfort at the door, not perfection.</div>
+    ${quizHtml(4,
+      "A homeowner opens the door and says 'I'm not interested.' What's your first move with AIR?",
+      ["Ask them why they're not interested and address the concern", "Tell them you'll only take 2 minutes and launch into the pitch", "Agree with them, don't dwell on it, and pivot back to your short story"],
+      2, "Give me more AIR rebuttal practice scenarios for Equity Management training."
+    )}
+  `);
+}
+
+// ── BUILD MODULE 5 ──────────────────────────────────────────────────────────
+function buildMod5() {
+  return moduleWrap(4, `
+    <div class="discovery-box">
+      <p><strong>Ask the room first:</strong> "Why do you think Verizon Fios is different from Cox or Xfinity? What have you heard?" Let people guess for 2–3 minutes. Write answers on the board. Then educate them on what's actually true — and why it matters at every door.</p>
+    </div>
+
+    <div class="section-label">The real answer — the technology</div>
+    <div class="vs-grid" style="margin-bottom:2rem;">
+      <div class="vs-card">
+        <div class="vs-card-header" style="background:var(--amber)">
+          <div class="vs-card-title" style="color:white">Copper Wire</div>
+          <div class="vs-card-sub" style="color:rgba(255,255,255,0.7)">Cox · Xfinity · Competitors</div>
+        </div>
+        <div class="vs-card-body">
+          ${['Traditional cable infrastructure', 'Shared bandwidth with your neighborhood', 'Speeds drop during peak hours (7–9pm)', 'Signal degrades over distance', 'What your customer is currently paying for'].map(t => `<div class="vs-item"><span class="vs-check" style="color:#c0392b">✗</span>${t}</div>`).join('')}
+        </div>
+      </div>
+      <div class="vs-badge" style="margin:0 auto;">VS</div>
+      <div class="vs-card" style="border:2px solid var(--teal)">
+        <div class="vs-card-header" style="background:var(--teal)">
+          <div class="vs-card-title" style="color:white">Fiber Optic</div>
+          <div class="vs-card-sub" style="color:rgba(255,255,255,0.7)">Verizon Fios</div>
+        </div>
+        <div class="vs-card-body">
+          ${['Light-based signal — not electrical', 'Dedicated line straight to your home', 'Consistent speed 24/7 — no slowdowns', '1024 mbps upload AND download on Gig', '325 ft coverage · 100 devices · Free install'].map(t => `<div class="vs-item"><span class="vs-check" style="color:var(--teal)">✓</span>${t}</div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Why this matters in the pitch</div>
+    <div class="card-grid card-grid-3">
+      <div class="card" style="border-left:4px solid var(--teal);">
+        <div class="card-title c-teal">Explains the Speed Test</div>
+        <div class="card-body">When a customer pays for 400 mbps and gets 90, copper is why. Fiber delivers what it promises — dedicated line, no sharing.</div>
+      </div>
+      <div class="card" style="border-left:4px solid var(--leaf);">
+        <div class="card-title c-leaf">Justifies the Switch</div>
+        <div class="card-body">You're not just selling cheaper. You're selling a fundamentally different product. That's a far stronger conversation.</div>
+      </div>
+      <div class="card" style="border-left:4px solid var(--gold);">
+        <div class="card-title c-gold">Builds Your Confidence</div>
+        <div class="card-body">When you genuinely believe the product is better — it shows at the door. Know this cold before you knock.</div>
+      </div>
+    </div>
+    <div class="trainer-note"><strong>Key insight:</strong> Copper is shared bandwidth. When everyone in the neighborhood streams at 7pm, everyone slows down. Fiber doesn't work that way — it's a dedicated line to that specific home.</div>
+    ${quizHtml(5,
+      "A customer says 'My Cox internet is fine, why would I switch?' What's the strongest response?",
+      ["Because Verizon has better customer service and more channels", "Cox runs on copper — a shared line that slows when neighbors are online. Fios fiber is dedicated to your home, so you always get what you pay for", "Because we're running a promotion in your area right now"],
+      1, "Quiz me more on fiber optic vs copper and why Verizon Fios beats Cox for Equity Management training."
+    )}
+  `);
+}
+
+// ── INIT ────────────────────────────────────────────────────────────────────
+function init() {
+  // Build hero modules list
+  const heroMods = document.getElementById('heroModules');
+  MODULES.forEach(m => {
+    const el = document.createElement('div');
+    el.className = 'hero-mod';
+    el.onclick = () => goTo(m.id);
+    el.innerHTML = `
+      <div class="hero-mod-num" style="background:${m.color}20;color:${m.color}">${m.id}</div>
+      <div class="hero-mod-info">
+        <div class="hero-mod-title">${m.title.replace('\n', ' ')}</div>
+        <div class="hero-mod-time">~${m.time} min</div>
+      </div>
+      <div class="hero-mod-arrow">›</div>
+    `;
+    heroMods.appendChild(el);
+  });
+
+  // Build dynamic module screens
+  const container = document.getElementById('dynamicScreens');
+  MODULES.forEach(m => {    const div = document.createElement('div');
+    div.className = 'screen';
+    div.id = 'screen-' + m.id;
+    div.innerHTML = m.build();
+    container.appendChild(div);
+  });
+
+  updateNav();
+}
+
+
+// ── DAY 2 DATA & STATE ───────────────────────────────────────────────────────
+let d2scores = { total: 0, answered: {} };
+
+const D2MODULES = [
+  {
+    id: 8, label: 'D2 Module 1', shortLabel: 'D2-1', title: '5 Steps to a\nConversation', time: 25,
+    color: 'var(--purple)', colorHex: '#6b4fa8',
+    desc: 'The system that builds impulse. Learn how each step of the pitch maps directly to the 5-step conversation framework.',
+    build: buildD2Mod1
+  },
+  {
+    id: 9, label: 'D2 Module 2', shortLabel: 'D2-2', title: 'Products\nDeep Dive', time: 20,
+    color: 'var(--teal)', colorHex: '#1e8a7a',
+    desc: 'Internet speeds, TV packages, DVR, phone, and add-ons. The rep who knows their product owns the conversation. Master this before you speak to a single customer.',
+    build: buildD2Mod2
+  },
+  {
+    id: 10, label: 'D2 Module 3', shortLabel: 'D2-3', title: 'Pricing\nGuide', time: 20,
+    color: 'var(--amber)', colorHex: '#c47a2a',
+    desc: 'Every price point, every discount, and the live package builder. Build the close at the door without hesitating.',
+    build: buildD2Mod3
+  },
+  {
+    id: 11, label: 'D2 Module 4', shortLabel: 'D2-4', title: 'Kahoot\nQuiz', time: 15,
+    color: 'var(--leaf)', colorHex: '#4a8c3f',
+    desc: 'Time to prove it. Scan the QR code, join the game, and show your trainer you own Day 1 and Day 2.',
+    build: buildD2Mod4
+  },
+];
+
+function d2ModuleWrap(modIdx, innerHtml) {
+  const mod = D2MODULES[modIdx];
+  const isLast = modIdx === D2MODULES.length - 1;
+  const prevId = modIdx === 0 ? 7 : mod.id - 1;
+  const nextId = isLast ? 12 : mod.id + 1;
+  const nextLabel = isLast ? 'Finish Day 2' : 'Next: ' + D2MODULES[modIdx + 1].title.replace('\n', ' ');
+
+  return `
+    <div class="mod-nav">
+      <button class="mod-nav-btn" onclick="goTo(${prevId})">← ${modIdx === 0 ? 'Day 2 Home' : D2MODULES[modIdx-1].title.replace('\n',' ')}</button>
+      <div class="mod-counter">${mod.label} of 4</div>
+      <button class="mod-nav-btn next-btn" onclick="goTo(${nextId})">${nextLabel} →</button>
+    </div>
+    <div class="module-wrap">
+      <div class="module-header">
+        <div class="module-header-left">
+          <div class="mod-label" style="color:${mod.color}">${mod.label} — ${mod.title.replace('\n', ' ')}</div>
+          <div class="mod-h1">${mod.title.replace('\n', '<br>')}</div>
+          <div class="mod-desc">${mod.desc}</div>
+        </div>
+        <div class="mod-timer">
+          <div class="mod-timer-num">${mod.time}</div>
+          <div class="mod-timer-label">minutes</div>
+        </div>
+      </div>
+      ${innerHtml}
+    </div>
+  `;
+}
+
+function d2QuizHtml(modId, question, opts, correctIdx, followupMsg) {
+  return `
+    <div class="quiz-section">
+      <div class="quiz-label">Quick Check</div>
+      <div class="quiz-q">${question}</div>
+      <div class="quiz-opts" id="qopts-${modId}">
+        ${opts.map((o, i) => `<button class="quiz-opt" onclick="d2QuizAnswer(${modId},${i},${i===correctIdx},${correctIdx},'${followupMsg}')">${o}</button>`).join('')}
+      </div>
+      <div class="quiz-feedback" id="qfb-${modId}"></div>
+      <button class="quiz-next-btn" id="qnxt-${modId}" onclick="sendToChat(${modId},'${followupMsg}')">Ask a follow-up ↗</button>
+    </div>
+  `;
+}
+
+function d2QuizAnswer(modId, idx, correct, correctIdx, followup) {
+  if (d2scores.answered[modId] !== undefined) return;
+  d2scores.answered[modId] = correct ? 1 : 0;
+  if (correct) d2scores.total++;
+
+  const opts = document.querySelectorAll(`#qopts-${modId} .quiz-opt`);
+  opts.forEach((o, i) => {
+    o.disabled = true;
+    if (i === idx) o.classList.add(correct ? 'correct' : 'wrong');
+    if (!correct && i === correctIdx) o.classList.add('correct');
+  });
+
+  const fb = document.getElementById('qfb-' + modId);
+  fb.style.color = correct ? '#4a8c3f' : '#c0392b';
+  fb.textContent = correct ? '✓ Correct — well done.' : '✗ Not quite — review the highlighted answer.';
+  document.getElementById('qnxt-' + modId).style.display = 'inline-block';
+  updateNav();
+}
+
+// ── D2 MODULE 1: 5 Steps to a Conversation ───────────────────────────────────
+function buildD2Mod1() {
+  const steps = [
+    {
+      num: 1, title: 'Introduction', color: 'var(--blue)',
+      tagColor: '#2d6fa8',
+      desc: `Who are you and why should they keep the door open? S.E.E.N. (Smile, Eye Contact, Enthusiasm, Nodding) all happen here. A great intro makes for an easy close.`,
+      pitchLabel: 'In the Pitch →',
+      pitchText: `"Hey how's it going? My name is ___. I'm the new territory manager with Fios." — This is your handshake. It has to be warm, confident, and natural. If you stumble here, everything after is an uphill battle.`,
+    },
+    {
+      num: 2, title: 'Short Story', color: 'var(--teal)',
+      tagColor: '#1e8a7a',
+      desc: `Why are you at their door specifically? Keep it short and simple. This is your hook — get to the reason you're there fast. The longer you take here, the more time they have to shut you down.`,
+      pitchLabel: 'In the Pitch →',
+      pitchText: `"I see you guys have Cox — a lot of your neighbors have been complaining about high bills and spotty internet. I'm just here to see if it makes sense." — One or two sentences max. Curiosity, not pressure.`,
+    },
+    {
+      num: 3, title: 'Presentation (3×3)', color: 'var(--amber)',
+      tagColor: '#c47a2a',
+      desc: `The bulk of the conversation. You're running C.P.R. (Create Personal Relationship) through F.O.R.D.S. (Family, Occupation, Recreation, Dogs, Sports). Ask 3 questions each about TV, Internet, and Phone. Wants, Needs, Negatives — Features Tell, Benefits Sell.`,
+      pitchLabel: 'In the Pitch →',
+      pitchText: `"What channels do you watch? Any sports or news? And do you guys record? OK — as far as your internet, what do you use it for... gaming, streaming, working from home?" — This is where you build the case. Every answer is ammo for your close.`,
+    },
+    {
+      num: 4, title: 'The Close', color: 'var(--purple)',
+      tagColor: '#6b4fa8',
+      desc: `ABCs of Closing: Assume the Sale, Be Assertive, Close with Confidence. Use the pre-close to frame the recommendation, then go into the 4-point close. Impulse peaks here — don't let it drop.`,
+      pitchLabel: 'In the Pitch →',
+      pitchText: `"Based on what you told me, I'd recommend the Fios Test Drive and Gigabit Internet. With taxes and everything included, I have you at only $___ per month." Then: lock the price, no money down, first bill 25 days after install, weekdays or weekends?`,
+    },
+    {
+      num: 5, title: 'Rehash (R.E.H.A.S.H.)', color: 'var(--leaf)',
+      tagColor: '#4a8c3f',
+      desc: `Remember Everyone Has Another Sale Hidden. After the close, go into MyVerizon, update the install, and plant the seed for the next sale. You already have their trust — use it.`,
+      pitchLabel: 'In the Pitch →',
+      pitchText: `"Now let me show you the MyVerizon app — you can manage your bill, watch FiosTV anywhere, and if you have family on Verizon Wireless, they'll get a discount on their plan too." Every customer is a referral waiting to happen.`,
+    },
+  ];
+
+  return d2ModuleWrap(0, `
+    <div class="discovery-box">
+      <p><strong>Core concept:</strong> Impulse is a sudden, unreflective urge to act. The 5-step conversation is a system specifically designed to build impulse from zero — from the moment you knock to the moment you get a signature. Every step has a job.</p>
+    </div>
+
+    <div class="section-label">The 5 steps — and exactly where they live in your pitch</div>
+    <div style="margin-bottom:2rem;">
+      ${steps.map(s => `
+        <div class="convo-step">
+          <div class="convo-num" style="background:${s.color}">${s.num}</div>
+          <div class="convo-content">
+            <div class="convo-title">${s.title}</div>
+            <div class="convo-desc">${s.desc}</div>
+            <div class="convo-pitch-quote" style="border-color:${s.tagColor}">
+              <span style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${s.tagColor};font-style:normal;">${s.pitchLabel}</span><br>
+              ${s.pitchText}
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="bridge-card">
+      <div class="bridge-title">How the 5 Steps build impulse</div>
+      ${[
+        ['Step 1–2', 'Open the door & earn 30 seconds', 'Step 3', 'Find the pain — build the need'],
+        ['Step 3', 'Build the need clearly', 'Step 4', 'Close before impulse drops'],
+        ['Step 4', 'Get the yes', 'Step 5', 'Turn one sale into two'],
+      ].map(([al,at,bl,bt]) => `
+        <div class="bridge-row">
+          <div class="bridge-box"><strong>${al}</strong>${at}</div>
+          <div class="bridge-arrow">→</div>
+          <div class="bridge-box"><strong>${bl}</strong>${bt}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="card-grid card-grid-3">
+      <div class="card" style="border-left:4px solid var(--blue);">
+        <div class="card-title c-blue">SEEN</div>
+        <div class="card-body">Smile · Eye Contact · Enthusiasm · Nodding. These four body-language habits are 100% within your control before you say a single word.</div>
+      </div>
+      <div class="card" style="border-left:4px solid var(--amber);">
+        <div class="card-title c-amber">CPR via FORDS</div>
+        <div class="card-body">Create a Personal Relationship using Family, Occupation, Recreation, Dogs, Sports. The more real the connection, the easier the close.</div>
+      </div>
+      <div class="card" style="border-left:4px solid var(--purple);">
+        <div class="card-title c-purple">Features Tell, Benefits Sell</div>
+        <div class="card-body">Don't just list specs — connect every feature to what it means for THIS customer's life. "325 ft coverage means your upstairs office stays connected."</div>
+      </div>
+    </div>
+
+    <div class="trainer-note"><strong>Role-play (15 min):</strong> One rep runs the full 5-step conversation from intro through close on a mock customer. Trainer plays a "Type 3 Too Busy" customer. After 3 minutes, debrief: which step created the most impulse? Which dropped it?</div>
+
+    ${d2QuizHtml(8,
+      "A customer gave you great info in the 3×3 — they game online, stream 4K, and work from home. Which step does that information power, and why?",
+      [
+        "Step 2 — it gives you material for a better short story",
+        "Step 4 — their exact use cases become the reasons you recommend Gig internet and justify the price",
+        "Step 5 — you use it to upsell wireless after the close"
+      ],
+      1, "Quiz me more on the 5 Steps to a Conversation and how they map to the Verizon pitch."
+    )}
+  `);
+}
+
+// ── D2 MODULE 2: Products Deep Dive ──────────────────────────────────────────
+function buildD2Mod2() {
+  return d2ModuleWrap(1, `
+    <div class="section-label">Fios Internet</div>
+
+    <div class="prod-card" style="border-color:var(--gold)">
+      <div class="prod-header" style="background:var(--forest)">
+        <div>
+          <div class="prod-name">Gig Internet</div>
+          <div class="prod-sub">Your default pitch — always lead here</div>
+        </div>
+        <div>
+          <div class="prod-price">$89.99</div>
+          <div class="prod-price-note">w/ autopay</div>
+        </div>
+      </div>
+      <div class="prod-body">
+        <div class="prod-row"><span class="prod-lbl">Speed</span><span class="prod-val">1024/1024 Mbps (upload = download)</span></div>
+        <div class="prod-row"><span class="prod-lbl">Coverage</span><span class="prod-val">325 ft from the router</span></div>
+        <div class="prod-row"><span class="prod-lbl">Devices</span><span class="prod-val">Up to 100 simultaneously</span></div>
+        <div class="prod-row"><span class="prod-lbl">Router + Extender</span><span class="prod-val prod-val-free">Included FREE</span></div>
+        <div class="prod-row"><span class="prod-lbl">Installation</span><span class="prod-val prod-val-free">FREE</span></div>
+        <div class="prod-row"><span class="prod-lbl">Without autopay</span><span class="prod-val">$99.99/mo</span></div>
+        <div class="prod-tip" style="border-color:var(--gold)"><strong>Why always Gig:</strong> Free install + free router + extender. The 500 Mbps plan has a $99 install fee — so Gig is a better deal even at a higher monthly rate. This is a non-argument.</div>
+      </div>
+    </div>
+
+    <div class="prod-card">
+      <div class="prod-header" style="background:var(--blue)">
+        <div><div class="prod-name">300 Mbps</div><div class="prod-sub">Price-sensitive fallback only</div></div>
+        <div><div class="prod-price">$49.99</div><div class="prod-price-note">w/ autopay</div></div>
+      </div>
+      <div class="prod-body">
+        <div class="prod-row"><span class="prod-lbl">Speed</span><span class="prod-val">300/300 Mbps</span></div>
+        <div class="prod-row"><span class="prod-lbl">Coverage</span><span class="prod-val">125 ft</span></div>
+        <div class="prod-row"><span class="prod-lbl">Devices</span><span class="prod-val">Up to 35</span></div>
+        <div class="prod-row"><span class="prod-lbl">Installation</span><span class="prod-val prod-val-fee">$99 fee</span></div>
+        <div class="prod-tip" style="border-color:var(--blue)"><strong>Use only when:</strong> The customer is extremely price-sensitive and absolutely won't move on Gig. Always try to make the Gig value case first — the $40 monthly difference is often worth it after you show the install fee math.</div>
+      </div>
+    </div>
+
+    <div class="section-label">TV Packages</div>
+    <div class="tv-grid">
+      <div class="tv-pkg featured">
+        <div class="tv-pkg-badge">⭐ Lead With This</div>
+        <div class="tv-pkg-name">Test Drive</div>
+        <div class="tv-pkg-price">$105/mo</div>
+        <div class="tv-pkg-ch">675 channels for 2 months</div>
+        <div class="tv-pkg-note">Verizon monitors what they watch → builds a custom package automatically. Same price as Your Fios but 675 channels. Easiest close.</div>
+      </div>
+      <div class="tv-pkg">
+        <div class="tv-pkg-badge">Top Tier</div>
+        <div class="tv-pkg-name">Most Fios</div>
+        <div class="tv-pkg-price">$149/mo</div>
+        <div class="tv-pkg-ch">675 channels</div>
+        <div class="tv-pkg-note">Free DVR ($20 credit). All premiums except HBO/Cinemax included.</div>
+      </div>
+      <div class="tv-pkg">
+        <div class="tv-pkg-badge">Mid Tier</div>
+        <div class="tv-pkg-name">More Fios</div>
+        <div class="tv-pkg-price">$129/mo</div>
+        <div class="tv-pkg-ch">425 channels</div>
+        <div class="tv-pkg-note">Standard DVR free ($12 credit). Good middle-ground offer.</div>
+      </div>
+      <div class="tv-pkg">
+        <div class="tv-pkg-badge">Entry</div>
+        <div class="tv-pkg-name">Your Fios</div>
+        <div class="tv-pkg-price">$105/mo</div>
+        <div class="tv-pkg-ch">250 channels</div>
+        <div class="tv-pkg-note">Pick 5 favorite networks + 200 similar. Change picks monthly. Same price as Test Drive — always steer to Test Drive.</div>
+      </div>
+    </div>
+
+    <div class="section-label">DVR, Boxes &amp; Phone</div>
+    <div class="card-grid card-grid-3" style="margin-bottom:1.5rem;">
+      <div class="card">
+        <div class="card-title">Standard DVR</div>
+        <div class="card-body">$12/mo · 2 shows at once · 50 hrs storage · 1 box</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Multi-room Enhanced</div>
+        <div class="card-body">$20/mo · 6 shows at once · 100 hrs (1TB) · 1–5 boxes</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Multi-room Premium</div>
+        <div class="card-body">$30/mo · 12 shows at once · 200 hrs (2TB) · 2–10 boxes</div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:1.5rem;border-left:4px solid var(--leaf);">
+      <div class="card-title c-leaf">Cable Box Pricing <span style="font-size:11px;font-weight:400;color:var(--gray);">(Box 1 always free)</span></div>
+      <div class="card-body"><strong style="color:#2a7a2a;">Box 1: Always free</strong> · Boxes 2–3: $12 each/mo · Boxes 4–6: $6 each/mo · Box 7+: Free again. All boxes pause, play, and rewind live TV up to 2 hours.</div>
+    </div>
+    <div class="card" style="margin-bottom:1rem;border-left:4px solid var(--teal);">
+      <div class="card-title c-teal">Home Phone — $30/mo</div>
+      <div class="card-body">Free calling to 11 international countries + 1 country of the customer's choice. Strong add-on for customers who call family abroad.</div>
+    </div>
+
+    <div class="trainer-note"><strong>Memory drill (5 min):</strong> Trainer calls out a customer scenario — "gamer household, 8 devices, doesn't have cable." Rep recites the exact product recommendation with price from memory. No looking at notes. Repeat until every rep can do it without hesitating.</div>
+
+    ${d2QuizHtml(9,
+      "A customer asks why Gig is worth $40 more per month than the 300 plan. What's the correct response?",
+      [
+        "Gig has faster speeds and better coverage for bigger homes",
+        "The 300 plan has a $99 install fee — so over 12 months, Gig actually saves you money, plus you get a free router, extender, and no install charge",
+        "Gig is business class internet so it's a premium product"
+      ],
+      1, "Quiz me more on Verizon Fios product specs and pricing for Equity Management training."
+    )}
+  `);
+}
+
+// ── D2 MODULE 3: Pricing Guide ────────────────────────────────────────────────
+function buildD2Mod3() {
+  return d2ModuleWrap(2, `
+    <div class="discovery-box">
+      <p><strong>Rule at the door:</strong> Never hesitate on price. Hesitation kills impulse. Know every number in this module cold so that when you say "I have you at only $___ per month" — it comes out smooth, confident, and final.</p>
+    </div>
+
+    <!-- Tab navigation -->
+    <div class="ptab-row">
+      <button class="ptab active" onclick="ptabShow('pt-internet',this)">Internet</button>
+      <button class="ptab" onclick="ptabShow('pt-tv',this)">TV</button>
+      <button class="ptab" onclick="ptabShow('pt-discounts',this)">Discounts</button>
+      <button class="ptab" onclick="ptabShow('pt-builder',this)">Builder</button>
+    </div>
+
+    <!-- INTERNET TAB -->
+    <div class="ptab-panel active" id="pt-internet">
+      <div class="disc-table">
+        <div class="disc-head">Internet Pricing — All w/ Autopay</div>
+        <div class="disc-row"><div><div class="disc-who">Gig — 1024/1024 Mbps</div><div class="disc-who-sub">Free install · Free router + extender · 325ft · 100 devices</div></div><div class="disc-amt" style="color:var(--forest)">$89.99</div></div>
+        <div class="disc-row"><div><div class="disc-who">500 Mbps</div><div class="disc-who-sub">$99 install · Router included · 225ft · 50 devices</div></div><div class="disc-amt" style="color:var(--forest)">$74.99</div></div>
+        <div class="disc-row"><div><div class="disc-who">300 Mbps</div><div class="disc-who-sub">$99 install · Router included · 125ft · 35 devices</div></div><div class="disc-amt" style="color:var(--forest)">$49.99</div></div>
+      </div>
+      <div class="card" style="border-left:4px solid var(--amber);">
+        <div class="card-title c-amber">Without Autopay</div>
+        <div class="card-body">Add $10/mo to any internet price. Always set up autopay — it saves the customer money and makes the close cleaner.</div>
+      </div>
+    </div>
+
+    <!-- TV TAB -->
+    <div class="ptab-panel" id="pt-tv">
+      <div class="disc-table">
+        <div class="disc-head">TV Packages — All w/ Autopay</div>
+        <div class="disc-row"><div><div class="disc-who">Test Drive</div><div class="disc-who-sub">675 ch for 2 months → auto to Your Fios · 1st box free</div></div><div class="disc-amt" style="color:var(--forest)">$105</div></div>
+        <div class="disc-row"><div><div class="disc-who">Most Fios</div><div class="disc-who-sub">675 ch · Free DVR ($20) · All premiums except HBO/Cinemax</div></div><div class="disc-amt" style="color:var(--forest)">$149</div></div>
+        <div class="disc-row"><div><div class="disc-who">More Fios</div><div class="disc-who-sub">425 ch · Standard DVR free ($12) · 1st box free</div></div><div class="disc-amt" style="color:var(--forest)">$129</div></div>
+        <div class="disc-row"><div><div class="disc-who">Your Fios</div><div class="disc-who-sub">250 ch · Pick 5 networks · Change monthly · 1st box free</div></div><div class="disc-amt" style="color:var(--forest)">$105</div></div>
+      </div>
+      <div class="disc-table" style="margin-top:14px;">
+        <div class="disc-head">Cable Box &amp; DVR Add-Ons</div>
+        <div class="disc-row" style="background:rgba(42,122,42,0.05);"><div><div class="disc-who" style="color:#2a7a2a;font-weight:600;">Box 1</div><div class="disc-who-sub">Always free</div></div><div class="disc-amt" style="font-size:16px;color:#2a7a2a;">Free</div></div>
+        <div class="disc-row"><div><div class="disc-who">Box 2–3</div></div><div class="disc-amt" style="font-size:16px;color:var(--gray)">$12 each</div></div>
+        <div class="disc-row"><div><div class="disc-who">Box 4–6</div></div><div class="disc-amt" style="font-size:16px;color:var(--gray)">$6 each</div></div>
+        <div class="disc-row"><div><div class="disc-who">Box 7+</div></div><div class="disc-amt" style="font-size:16px;color:#2a7a2a">Free</div></div>
+        <div class="disc-row"><div><div class="disc-who">Standard DVR</div></div><div class="disc-amt" style="font-size:16px;color:var(--gray)">$12/mo</div></div>
+        <div class="disc-row"><div><div class="disc-who">Multi-room Enhanced DVR</div></div><div class="disc-amt" style="font-size:16px;color:var(--gray)">$20/mo</div></div>
+        <div class="disc-row"><div><div class="disc-who">Multi-room Premium DVR</div></div><div class="disc-amt" style="font-size:16px;color:var(--gray)">$30/mo</div></div>
+      </div>
+    </div>
+
+    <!-- DISCOUNTS TAB -->
+    <div class="ptab-panel" id="pt-discounts">
+      <div style="background:var(--gold);border-radius:12px;padding:13px 18px;font-size:13px;font-weight:700;color:var(--forest);text-align:center;margin-bottom:14px;">
+        💬 Ask every customer — every single time
+      </div>
+      <div class="disc-table">
+        <div class="disc-head">Monthly Discounts</div>
+        <div class="disc-row"><div><div class="disc-who">Existing Verizon Wireless</div><div class="disc-who-sub">Current Verizon mobile customer</div></div><div class="disc-amt">$15<span style="font-size:12px;font-weight:400;color:var(--gray)">/mo off</span></div></div>
+        <div class="disc-row"><div><div class="disc-who">1st Responder / Teacher (Gig)</div><div class="disc-who-sub">Police · Military · Fire · Nurse · Active educators</div></div><div class="disc-amt">$15<span style="font-size:12px;font-weight:400;color:var(--gray)">/mo off</span></div></div>
+        <div class="disc-row"><div><div class="disc-who">1st Responder / Teacher (300/500)</div><div class="disc-who-sub">Police · Military · Fire · Nurse · Active educators</div></div><div class="disc-amt">$5<span style="font-size:12px;font-weight:400;color:var(--gray)">/mo off</span></div></div>
+        <div class="disc-row"><div><div class="disc-who">New Wireless Customers</div><div class="disc-who-sub">Must have Fios first</div></div><div class="disc-amt">$10<span style="font-size:12px;font-weight:400;color:var(--gray)">/line off</span></div></div>
+        <div class="disc-row" style="background:rgba(45,90,45,0.06);"><div><div class="disc-who">Fios Forward / Gov&#39;t Assistance</div><div class="disc-who-sub">Qualifying government assistance programs</div></div><div class="disc-amt">$30<span style="font-size:12px;font-weight:400;color:var(--gray)">/mo off</span></div></div>
+      </div>
+      <div class="trainer-note"><strong>Rule:</strong> Lead with value, then reveal the discount to close hesitant customers. Discounts stack with autopay savings.</div>
+    </div>
+
+    <!-- BUILDER TAB -->
+    <div class="ptab-panel" id="pt-builder">
+      <div class="builder-wrap">
+        <div class="builder-h">Package Builder</div>
+        <div class="builder-sub">Build the customer's package in real time. Every number calculates automatically.</div>
+
+        <div class="b2-row">
+          <div class="b2-label">Internet</div>
+          <select class="b2-select" onchange="b2Calc()">
+            <option value="0">No internet</option>
+            <option value="89.99" selected>Gig — $89.99/mo</option>
+            <option value="74.99">500 Mbps — $74.99/mo</option>
+            <option value="49.99">300 Mbps — $49.99/mo</option>
+          </select>
+        </div>
+        <div class="b2-row">
+          <div class="b2-label">TV Package</div>
+          <select class="b2-select" onchange="b2Calc()">
+            <option value="0">No TV</option>
+            <option value="105">Test Drive — $105/mo</option>
+            <option value="149">Most Fios — $149/mo</option>
+            <option value="129">More Fios — $129/mo</option>
+            <option value="105">Your Fios — $105/mo</option>
+          </select>
+        </div>
+        <div class="b2-row">
+          <div class="b2-label">DVR</div>
+          <select class="b2-select" onchange="b2Calc()">
+            <option value="0">No DVR</option>
+            <option value="12">Standard — $12/mo</option>
+            <option value="20">Multi-room Enhanced — $20/mo</option>
+            <option value="30">Multi-room Premium — $30/mo</option>
+          </select>
+        </div>
+        <div class="b2-row">
+          <div class="b2-label">Cable Boxes (Box 1 is free)</div>
+          <select class="b2-select" onchange="b2Calc()">
+            <option value="0">1 box — Free</option>
+            <option value="12">2 boxes — +$12/mo</option>
+            <option value="24">3 boxes — +$24/mo</option>
+            <option value="30">4 boxes — +$30/mo</option>
+            <option value="36">5 boxes — +$36/mo</option>
+            <option value="42">6 boxes — +$42/mo</option>
+          </select>
+        </div>
+        <div class="b2-row">
+          <div class="b2-label">Home Phone</div>
+          <select class="b2-select" onchange="b2Calc()">
+            <option value="0">No phone</option>
+            <option value="30">Home Phone — $30/mo</option>
+          </select>
+        </div>
+        <div class="b2-row">
+          <div class="b2-label">Discount</div>
+          <select class="b2-select" onchange="b2Calc()">
+            <option value="0">No discount</option>
+            <option value="15">Existing Wireless — $15/mo off</option>
+            <option value="15">1st Responder / Teacher (Gig) — $15/mo off</option>
+            <option value="5">1st Responder / Teacher (300/500) — $5/mo off</option>
+            <option value="30">Fios Forward / Gov&#39;t Assistance — $30/mo off</option>
+          </select>
+        </div>
+      </div>
+      <div class="b2-total-panel">
+        <div class="b2-line-items" id="b2LineItems"></div>
+        <div class="b2-grand-row">
+          <div>
+            <div class="b2-grand-label">Monthly Total</div>
+            <div class="b2-grand-note">with autopay</div>
+          </div>
+          <div class="b2-grand-total" id="b2GrandTotal">$89.99</div>
+        </div>
+      </div>
+    </div>
+
+    ${d2QuizHtml(10,
+      "A customer is an existing Verizon Wireless user and a nurse. She wants Gig internet and the Test Drive TV package. What's her monthly total with autopay?",
+      [
+        "$89.99 + $105 − $15 − $15 = $164.99/mo",
+        "$89.99 + $105 = $194.99/mo (discounts don't stack)",
+        "$89.99 + $105 − $15 = $179.99/mo (only one discount applies)"
+      ],
+      0, "Quiz me more on Verizon Fios pricing and discounts for Equity Management training."
+    )}
+  `);
+}
+
+// ── D2 MODULE 4: Kahoot Quiz ──────────────────────────────────────────────────
+function buildD2Mod4() {
+  return d2ModuleWrap(3, `
+    <div class="kahoot-wrap">
+      <div class="kahoot-icon">🎮</div>
+      <div class="kahoot-title">Time for<br>a Quiz</div>
+      <div class="kahoot-sub">You've covered Day 1 and Day 2. Now prove it. Scan the QR code below, join the Kahoot, and show your trainer you know this stuff cold.</div>
+
+      <div class="qr-box">
+        <div class="qr-placeholder">
+          <div class="qr-placeholder-icon">📲</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--ink);">Kahoot QR Code</div>
+          <div style="font-size:11px;color:var(--gray);max-width:160px;line-height:1.5;">Your trainer will display the live QR code here</div>
+        </div>
+      </div>
+
+      <div class="kahoot-rules">
+        <div class="kahoot-rules-title">How it works</div>
+        <div class="kahoot-rule"><span class="kahoot-rule-num">1</span><span>Trainer launches the Kahoot on the main screen</span></div>
+        <div class="kahoot-rule"><span class="kahoot-rule-num">2</span><span>Scan the QR code or go to kahoot.it and enter the game PIN</span></div>
+        <div class="kahoot-rule"><span class="kahoot-rule-num">3</span><span>Use your real first name so the trainer can track scores</span></div>
+        <div class="kahoot-rule"><span class="kahoot-rule-num">4</span><span>Questions cover Day 1 and Day 2 — 8 Steps, Law of Averages, Garden Theory, Pitch, Fiber vs Copper, 5 Steps, Products, Pricing</span></div>
+        <div class="kahoot-rule"><span class="kahoot-rule-num">5</span><span>Screenshot your final score and send it to your manager</span></div>
+      </div>
+
+      <div style="margin-top:2rem;padding:20px;background:rgba(201,168,76,0.1);border-radius:16px;border:1.5px solid var(--gold);">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--amber);margin-bottom:8px;">📸 Pass mark</div>
+        <div style="font-size:14px;color:var(--ink);line-height:1.7;">Score <strong>80% or higher</strong> to complete your Day 2 certification. Send the screenshot to your manager to unlock your next stage in the progression.</div>
+      </div>
+    </div>
+
+    ${d2QuizHtml(11,
+      "Before the Kahoot — quick final check. What are the 4 FUGI factors used to rebuild impulse when a customer hesitates?",
+      [
+        "Fear · Urgency · Greed · Indifference",
+        "Features · Urgency · Greed · Interest",
+        "Fear · Understanding · Greed · Indifference"
+      ],
+      0, "Quiz me on FUGI factors and how to rebuild impulse in a Verizon Fios pitch."
+    )}
+  `);
+}
+
+// ── BUILDER CALC ──────────────────────────────────────────────────────────────
+function b2Calc() {
+  const selects = document.querySelectorAll('.b2-select');
+  let total = 0, lines = '';
+  for (let i = 0; i < 5; i++) {
+    const val = parseFloat(selects[i].value) || 0;
+    if (val > 0) {
+      const name = selects[i].options[selects[i].selectedIndex].text.split(' — ')[0];
+      total += val;
+      lines += `<div class="b2-line"><span>${name}</span><span>$${val.toFixed(2)}</span></div>`;
+    }
+  }
+  const disc = parseFloat(selects[5].value) || 0;
+  if (disc > 0) {
+    const dname = selects[5].options[selects[5].selectedIndex].text.split(' — ')[0];
+    total -= disc;
+    lines += `<div class="b2-line b2-line-disc"><span>${dname}</span><span>−$${disc.toFixed(2)}</span></div>`;
+  }
+  if (!lines) lines = '<div class="b2-line"><span>Select products above</span><span>—</span></div>';
+  const li = document.getElementById('b2LineItems');
+  const gt = document.getElementById('b2GrandTotal');
+  if (li) li.innerHTML = lines;
+  if (gt) gt.textContent = total > 0 ? `$${total.toFixed(2)}` : '$0.00';
+}
+
+// ── PRICING TAB SWITCHER ──────────────────────────────────────────────────────
+function ptabShow(id, btn) {
+  document.querySelectorAll('.ptab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+// ── D2 INIT ───────────────────────────────────────────────────────────────────
+function initD2() {
+  // Build Day 2 hero module list
+  const d2Hero = document.getElementById('d2HeroModules');
+  if (!d2Hero) return;
+  D2MODULES.forEach(m => {
+    const el = document.createElement('div');
+    el.className = 'hero-mod';
+    el.onclick = () => goTo(m.id);
+    el.innerHTML = `
+      <div class="hero-mod-num" style="background:${m.color}20;color:${m.color}">${m.id - 7}</div>
+      <div class="hero-mod-info">
+        <div class="hero-mod-title">${m.title.replace('\n', ' ')}</div>
+        <div class="hero-mod-time">~${m.time} min</div>
+      </div>
+      <div class="hero-mod-arrow">›</div>
+    `;
+    d2Hero.appendChild(el);
+  });
+
+  // Build D2 module screens
+  const container = document.getElementById('d2DynamicScreens');
+  if (!container) return;
+  D2MODULES.forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'screen';
+    div.id = 'screen-' + m.id;
+    div.innerHTML = m.build();
+    container.appendChild(div);
+  });
+}
+
+init();
+initD2();
+b2Calc();
+</script>
+</body>
+</html>
